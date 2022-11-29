@@ -69,7 +69,7 @@ def get_api_answer(timestamp):
             ))
     response_status = response.status_code
     if response_status != 200:
-        logging.error('Недоступность эндпоинта {}'.format(error))
+        logging.error('Недоступность эндпоинта {}')
         raise EndpointError(
             '{response_status}, {url}, {headers}, {params}'.format(
                 response_status=response_status,
@@ -93,10 +93,7 @@ def check_response(response):
 
 
 def parse_status(homework):
-    """
-    Извлекает из информации о конкретной
-    домашней работе статус этой работы.
-    """
+    """Отображает статус домашней работы."""
     if homework is None:
         raise HomeworkIsNone('Последняя домашняя работа не найдена')
 
@@ -117,7 +114,6 @@ def parse_status(homework):
 
 def main():
     """Основная логика работы бота."""
-
     if not check_tokens():
         logging.error('Ошибка глобальной переменной.')
         raise EmptyVariables('Ошибка глобальной переменной.')
