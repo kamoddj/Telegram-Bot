@@ -17,3 +17,7 @@ class DataTypeError(Exception):
 class HomeworkIsNone(Exception):
     """Обьект домашней работы не найден"""
     pass
+
+class NoKeys(Exception):
+    """Нужные ключи отсутствую"""
+    pass
