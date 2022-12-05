@@ -50,7 +50,8 @@ def check_tokens():
         'PRACTICUM_TOKEN': PRACTICUM_TOKEN,
         'TELEGRAM_TOKEN': TELEGRAM_TOKEN,
         'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
-        }
+                    }
+
     for token in CHECK_TOKENS.values():
         if token is None:
             logger.critical('Отсутствует глобальная переменная')
