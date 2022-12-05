@@ -46,10 +46,9 @@ logger.addHandler(handler)
 
 def check_tokens():
     """Проверяет доступность переменных окружения."""
-    CHECK_TOKENS = {
-        'PRACTICUM_TOKEN': PRACTICUM_TOKEN,
-        'TELEGRAM_TOKEN': TELEGRAM_TOKEN,
-        'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
+    CHECK_TOKENS = {'PRACTICUM_TOKEN': PRACTICUM_TOKEN,
+                    'TELEGRAM_TOKEN': TELEGRAM_TOKEN,
+                    'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
                     }
 
     for token in CHECK_TOKENS.values():
