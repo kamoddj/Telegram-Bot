@@ -105,34 +105,37 @@ def get_api_answer(timestamp):
 
 def check_response(response):
     """Проверяет ответ API на соответствие документации."""
-    if type(response) != dict:
+    if not isinstance(response, dict):
         logging.error('Пришел не словарь')
         raise TypeError('Пришел не словарь с домашней работой')
-    if 'homeworks' not in response:
+    homework_response = response.get('homeworks')
+    if 'homeworks' not in response or 'current_date' not in response:
         logging.error('Отсутствуют ключ homeworks')
         raise NoKeys('homeworks отсутствуют')
     if not isinstance(response['homeworks'], list):
         logger.error('Ошибка типа')
         raise TypeError('Ошибка типа объекта')
-    if response['homeworks'] != []:
-        return response['homeworks']
-    else:
+    if not response['homeworks']:
         raise EmptyVariables('Задание еще не проверено')
+    return homework_response
 
 
 def parse_status(homework):
     """Отображает статус домашней работы."""
     if homework is None:
         raise HomeworkIsNone('Последняя домашняя работа не найдена')
-
-    homework_name = homework.get('homework_name')
-    homework_status = homework.get('status')
+    print(homework)
+    if isinstance(homework, dict):
+        homework_name = homework.get('homework_name')
+        homework_status = homework.get('status')
+    else:
+        raise DataTypeError('Пришел не словарь')
 
     if homework_status not in HOMEWORK_VERDICTS:
-        logger.error('-')
+        logger.error(f'Статус работы не найден {homework_status}')
         raise NameError('{}'.format(homework_status))
 
-    if 'homework_name' not in homework:
+    if homework_name is None:
         logger.error('Название работы по ключу homework_name не найдено')
         raise DataTypeError('Ответ получен не dict')
 
@@ -145,22 +148,22 @@ def main():
     logging.debug('Запуск бота')
     if not check_tokens():
         logger.critical('Ошибка глобальной переменной.')
-        raise sys.exit(1)
+        sys.exit('Одна из переменных не указана или записанна не правильно')
 
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     timestamp = int(time.time())
-    STATUS = ''
+    status = ''
 
     while True:
         try:
             response = get_api_answer(timestamp)
             homework = check_response(response)[0]
-            if len(homework) == 0:
+            if not len(homework):
                 logger.debug('Отсутствуют новые статусы')
             message = parse_status(homework)
-            if message != STATUS:
+            if message != status:
                 send_message(bot, message)
-                STATUS = message
+                status = message
             timestamp = response.get('current_date')
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
