@@ -46,12 +46,12 @@ logger.addHandler(handler)
 
 def check_tokens():
     """Проверяет доступность переменных окружения."""
-    CHECK_TOKENS = {'PRACTICUM_TOKEN': PRACTICUM_TOKEN,
+    test_data = {'PRACTICUM_TOKEN': PRACTICUM_TOKEN,
                     'TELEGRAM_TOKEN': TELEGRAM_TOKEN,
                     'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
                     }
 
-    for token in CHECK_TOKENS.values():
+    for token in test_data.values():
         if token is None:
             logger.critical('Отсутствует глобальная переменная')
             return False
@@ -112,32 +112,36 @@ def check_response(response):
     if 'homeworks' not in response or 'current_date' not in response:
         logging.error('Отсутствуют ключ homeworks')
         raise NoKeys('homeworks отсутствуют')
-    if not isinstance(response['homeworks'], list):
+    if not isinstance(homework_response, list):
         logger.error('Ошибка типа')
         raise TypeError('Ошибка типа объекта')
-    if not response['homeworks']:
+    if not homework_response:
         raise EmptyVariables('Задание еще не проверено')
     return homework_response
 
 
 def parse_status(homework):
     """Отображает статус домашней работы."""
-    if homework is None:
+    if not homework:
         raise HomeworkIsNone('Последняя домашняя работа не найдена')
-    print(homework)
-    if isinstance(homework, dict):
-        homework_name = homework.get('homework_name')
-        homework_status = homework.get('status')
-    else:
+    if not isinstance(homework, dict):
         raise DataTypeError('Пришел не словарь')
+    homework_name = homework.get('homework_name')
+
+    if not homework_name:
+        logger.error('Название работы по ключу homework_name не найдено')
+        raise DataTypeError('Ответ получен не dict')
+
+    homework_status = homework.get('status')
+
+    if not homework_status:
+        logger.error('Статус работы не найден')
+        raise DataTypeError('Ответ получен не dict') 
 
     if homework_status not in HOMEWORK_VERDICTS:
         logger.error(f'Статус работы не найден {homework_status}')
         raise NameError('{}'.format(homework_status))
 
-    if homework_name is None:
-        logger.error('Название работы по ключу homework_name не найдено')
-        raise DataTypeError('Ответ получен не dict')
 
     verdict = HOMEWORK_VERDICTS[homework_status]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
@@ -158,7 +162,7 @@ def main():
         try:
             response = get_api_answer(timestamp)
             homework = check_response(response)[0]
-            if not len(homework):
+            if not homework:
                 logger.debug('Отсутствуют новые статусы')
             message = parse_status(homework)
             if message != status:
@@ -170,7 +174,6 @@ def main():
             send_message(bot, message)
         finally:
             time.sleep(RETRY_PERIOD)
-        logger.debug('Успешная отправка сообщения')
 
 
 if __name__ == '__main__':
