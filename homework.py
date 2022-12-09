@@ -47,9 +47,9 @@ logger.addHandler(handler)
 def check_tokens():
     """Проверяет доступность переменных окружения."""
     test_data = {'PRACTICUM_TOKEN': PRACTICUM_TOKEN,
-                    'TELEGRAM_TOKEN': TELEGRAM_TOKEN,
-                    'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
-                    }
+                 'TELEGRAM_TOKEN': TELEGRAM_TOKEN,
+                 'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
+                 }
 
     for token in test_data.values():
         if token is None:
@@ -136,12 +136,11 @@ def parse_status(homework):
 
     if not homework_status:
         logger.error('Статус работы не найден')
-        raise DataTypeError('Ответ получен не dict') 
+        raise DataTypeError('Ответ получен не dict')
 
     if homework_status not in HOMEWORK_VERDICTS:
         logger.error(f'Статус работы не найден {homework_status}')
         raise NameError('{}'.format(homework_status))
-
 
     verdict = HOMEWORK_VERDICTS[homework_status]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
